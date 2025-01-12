@@ -5,6 +5,8 @@ class Data:
         "password": "querty123456"
     }
 
+    courier_data_auth_id = 434904
+
     courier_data_for_registration_without_login = {
         "password": 'password123',
         "firstName": 'Anna'
@@ -26,3 +28,6 @@ class Data:
         "password": "querty12340"
     }
 
+    courier_data_without_login = {
+       "password": "querty12340"
+   }

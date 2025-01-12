@@ -2,62 +2,17 @@ import requests
 from urls import BASE_URL, COURIERS_URL
 from helpers import Generator
 from data import Data
+import allure
 
 
 class CourierMethods:
 
-    def register_new_courier_and_return_login_password(self):
-
-        # создаём список, чтобы метод мог его вернуть
-        login_pass = []
-
-        # генерируем логин, пароль и имя курьера
-        login = Generator.generate_random_string(10)
-        password = Generator.generate_random_string(10)
-        first_name = Generator.generate_random_string(10)
-
-        # собираем тело запроса
-        payload = {
-            "login": login,
-            "password": password,
-            "firstName": first_name
-        }
-
-        # отправляем запрос на регистрацию курьера и сохраняем ответ в переменную response
-        response = requests.post(f"{BASE_URL}{COURIERS_URL}", data=payload)
-
-        # если регистрация прошла успешно (код ответа 201), добавляем в список логин и пароль курьера
-        if response.status_code == 201:
-            login_pass.append(login)
-            login_pass.append(password)
-            login_pass.append(first_name)
-
-        # возвращает словарь
-        return payload
-
-    def register_new_courier_return_list(self):
-        login_pass = []
-        login = Generator.generate_random_string(10)
-        password = Generator.generate_random_string(10)
-        first_name = Generator.generate_random_string(10)
-
-        payload = {
-            "login": login,
-            "password": password,
-            "firstName": first_name
-        }
-
-        response = requests.post(f"{BASE_URL}{COURIERS_URL}", json=payload)
-
-        if response.status_code == 201:
-            login_pass = [login, password, first_name]
-
-        return login_pass
-
+    @allure.step("Создание нового курьера без заполнения поля 'Имя'")
     def register_new_courier_without_first_name(self):
+        generator = Generator()
         login_pass = []
-        login = Generator.generate_random_string(length=8)
-        password = Generator.generate_random_string(length=8)
+        login = generator.generate_random_string(length=8)
+        password = generator.generate_random_string(length=8)
 
         payload = {
             "login": login,
@@ -72,9 +27,11 @@ class CourierMethods:
 
         return response.status_code, response.text, login_pass
 
-    def try_register_new_courier_without_login(self):
-        login = Generator.generate_random_string(length=8)
-        first_name = Generator.generate_random_string(length=8)
+    @allure.step("Попытка создания нового курьера без ввода пароля")
+    def try_register_new_courier_without_password(self):
+        generator = Generator()
+        login = generator.generate_random_string(length=8)
+        first_name = generator.generate_random_string(length=8)
 
         payload = {
             "login": login,
@@ -84,13 +41,16 @@ class CourierMethods:
         response = requests.post(f"{BASE_URL}{COURIERS_URL}", json=payload)
         return response.status_code, response.json()['message']
 
+    @allure.step("Попытка создания курьеров с одинаковыми данными")
     def try_register_same_couriers(self):
         payload = Data.courier_data_for_registration_same_courier
         response = requests.post(f"{BASE_URL}{COURIERS_URL}", json=payload)
         return response.status_code, response.json()['message']
 
+    @allure.step("Авторизация курьера в системе")
     def courier_auth(self):
-        courier_data = self.register_new_courier_return_list()
+        generator = Generator()
+        st_code_c, text_c, courier_data = generator.register_new_courier()
 
         payload = {
             "login": courier_data[0],
@@ -98,23 +58,28 @@ class CourierMethods:
         }
 
         response = requests.post(f"{BASE_URL}{COURIERS_URL}login", json=payload)
-        return response.status_code, response.text, response.json().get("id")
+        response_json = response.json()
+        return response.status_code, response.text, response_json.get("id")
 
+    @allure.step("Попытка авторизации курьера в системе с невалидным логином")
     def courier_auth_with_wrong_login(self):
         payload = Data.courier_data_with_wrong_login
         response = requests.post(f"{BASE_URL}{COURIERS_URL}login", json=payload)
         return response.status_code, response.json()['message']
 
+    @allure.step("Попытка авторизации курьера в системе с невалидным паролем")
     def courier_auth_with_wrong_password(self):
         payload = Data.courier_data_with_wrong_password
         response = requests.post(f"{BASE_URL}{COURIERS_URL}login", json=payload)
         return response.status_code, response.json()['message']
 
+    @allure.step("Попытка авторизации курьера в системе без заполнения поля 'Логина'")
     def courier_auth_without_login(self):
-        payload = Data.courier_data_auth["password"]
+        payload = Data.courier_data_without_login
         response = requests.post(f"{BASE_URL}{COURIERS_URL}login", json=payload)
         return response.status_code, response.json()['message']
 
+    @allure.step("Удаление курьера")
     def delete_courier(self):
         status_code, response_text, courier_id = self.courier_auth()
 
@@ -125,6 +90,7 @@ class CourierMethods:
         response = requests.delete(f"{BASE_URL}{COURIERS_URL}{courier_id}", json=payload)
         return response.status_code, response.text
 
+    @allure.step("Попытка удаления курьера с вводом невалидного id")
     def delete_courier_with_wrong_id(self):
 
         payload = {
@@ -134,6 +100,7 @@ class CourierMethods:
         response = requests.delete(f"{BASE_URL}{COURIERS_URL}0", json=payload)
         return response.status_code, response.json()["message"]
 
+    @allure.step("Попытка удаления курьера без ввода id")
     def delete_courier_without_id(self):
 
         payload = {
