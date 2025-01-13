@@ -1,5 +1,4 @@
 class Data:
-
     courier_data_auth = {
         "login": "username_23",
         "password": "querty123456"
@@ -29,5 +28,5 @@ class Data:
     }
 
     courier_data_without_login = {
-       "password": "querty12340"
-   }
+        "password": "querty12340"
+    }

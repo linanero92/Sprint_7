@@ -1,4 +1,5 @@
 from methods.courier_methods import CourierMethods
+from error_messages import *
 import allure
 
 
@@ -17,18 +18,18 @@ class TestCourierLogin:
         courier_methods = CourierMethods()
         status_code, response_context = courier_methods.courier_auth_with_wrong_login()
         assert status_code == 404
-        assert response_context == "Учетная запись не найдена"
+        assert response_context == ACCOUNT_NOT_FOUND
 
     @allure.title("Проверка авторизации курьера, используя невалидный пароль")
     def test_courier_auth_with_wrong_password(self):
         courier_methods = CourierMethods()
         status_code, response_context = courier_methods.courier_auth_with_wrong_password()
         assert status_code == 404
-        assert response_context == "Учетная запись не найдена"
+        assert response_context == ACCOUNT_NOT_FOUND
 
     @allure.title("Проверка авторизации курьера без ввода логина")
     def test_courier_auth_without_login(self):
         courier_methods = CourierMethods()
         status_code, response_context = courier_methods.courier_auth_without_login()
         assert status_code == 400
-        assert response_context == "Недостаточно данных для входа"
+        assert response_context == NOT_ENOUGH_LOGIN_DATA

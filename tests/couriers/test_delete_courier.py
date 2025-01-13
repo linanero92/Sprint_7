@@ -1,4 +1,5 @@
 from methods.courier_methods import CourierMethods
+from error_messages import *
 import allure
 
 
@@ -16,11 +17,11 @@ class TestDeleteCourier:
         courier_methods = CourierMethods()
         status_code, response_context = courier_methods.delete_courier_with_wrong_id()
         assert status_code == 404
-        assert response_context == "Курьера с таким id нет."
+        assert response_context == WRONG_COURIER_ID
 
     @allure.title("Проверка удаления курьера без ввода id курьера")
     def test_delete_courier_without_id(self):
         courier_methods = CourierMethods()
         status_code, response_context = courier_methods.delete_courier_without_id()
         assert status_code == 404
-        assert response_context == "Not Found."
+        assert response_context == NOT_FOUND

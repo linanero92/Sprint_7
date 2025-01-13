@@ -61,6 +61,19 @@ class CourierMethods:
         response_json = response.json()
         return response.status_code, response.text, response_json.get("id")
 
+    @allure.step("Авторизация курьера без имени в системе")
+    def auth_of_courier_without_first_name(self):
+        st_code_c, text_c, courier_data = self.register_new_courier_without_first_name()
+
+        payload = {
+            "login": courier_data[0],
+            "password": courier_data[1]
+        }
+
+        response = requests.post(f"{BASE_URL}{COURIERS_URL}login", json=payload)
+        response_json = response.json()
+        return response.status_code, response.text, response_json.get("id")
+
     @allure.step("Попытка авторизации курьера в системе с невалидным логином")
     def courier_auth_with_wrong_login(self):
         payload = Data.courier_data_with_wrong_login
@@ -82,6 +95,17 @@ class CourierMethods:
     @allure.step("Удаление курьера")
     def delete_courier(self):
         status_code, response_text, courier_id = self.courier_auth()
+
+        payload = {
+            "id": courier_id
+        }
+
+        response = requests.delete(f"{BASE_URL}{COURIERS_URL}{courier_id}", json=payload)
+        return response.status_code, response.text
+
+    @allure.step("Удаление курьера без имени")
+    def delete_courier_without_first_name(self):
+        status_code, response_text, courier_id = self.auth_of_courier_without_first_name()
 
         payload = {
             "id": courier_id

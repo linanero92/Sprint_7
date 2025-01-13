@@ -1,4 +1,5 @@
 from methods.courier_methods import CourierMethods
+from error_messages import *
 import allure
 
 
@@ -17,12 +18,12 @@ class TestCreateCourier:
         courier_methods = CourierMethods()
         status_code, response_context = courier_methods.try_register_new_courier_without_password()
         assert status_code == 400
-        assert response_context == "Недостаточно данных для создания учетной записи"
+        assert response_context == NOT_ENOUGH_DATA_TO_CREATE_ACCOUNT
 
-    @allure.title("Проверка создания нового курьера с одинаковыми данными")
+    @allure.title("Проверка создания нового курьеров с одинаковыми данными")
     def test_register_two_same_couriers(self):
         courier_methods = CourierMethods()
         courier_methods.try_register_same_couriers()
         status_code, response_context = courier_methods.try_register_same_couriers()
         assert status_code == 409
-        assert response_context == "Этот логин уже используется. Попробуйте другой."
+        assert response_context == LOGIN_TAKEN
